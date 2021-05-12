@@ -1,5 +1,5 @@
 ------------Dalat-------------
-Temperature: 290.58
-Humidity: 96
-Pressure: 1010
-Weather Report: overcast clouds
+Temperature: 289.95
+Humidity: 98
+Pressure: 1012
+Weather Report: broken clouds
