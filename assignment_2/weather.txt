@@ -1,5 +1,5 @@
-------------LONDON------------
-Temperature: 286.99
-Humidity: 57
+------------Dalat-------------
+Temperature: 290.58
+Humidity: 96
 Pressure: 1010
-Weather Report: few clouds
+Weather Report: overcast clouds
