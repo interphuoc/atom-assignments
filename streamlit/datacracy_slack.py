@@ -9,6 +9,10 @@ import pandas as pd
 import numpy as np
 import re
 from datetime import datetime as dt
+pd.plotting.register_matplotlib_converters()
+import matplotlib.pyplot as plt
+from statistics import median
+# %matplotlib inline
 
 st.set_page_config(layout="wide")
 
@@ -154,7 +158,38 @@ if valid_user_id:
     discuss_df = p_msg_df[p_msg_df.channel_name.str.contains('discuss')]
     discuss_df = discuss_df.sort_values(['msg_date','msg_time'])
     dis_cols3 = ['channel_name','msg_date', 'msg_time','wordcount','reply_user_count','reply1_name']
+
+    ## Summary
+    filter_msg_df = p_msg_df[(p_msg_df.user_id == user_id) | (p_msg_df.reply_user1 == user_id) | (p_msg_df.reply_user2 == user_id)]
+
+    # * Số assignment đã nộp: submit_cnt
+    # * % bài được review: percentage_review
+    # * Số wordcount đã thảo luận: word_cnt
+    # * Extract thứ trong tuần (weekday) của ngày nộp bài: submit_weekday
+    # * Extract giờ trong ngày nộp bài (hour): submit_hour
+
+    ## summary
+    filter_msg_df = filter_msg_df[filter_msg_df['user_id'] ==  user_id].head(1)[['user_id','submit_name', 'DataCracy_role']]
+    submit_cnt = len(submit_df)
+    percentage_review = round(len(submit_df[submit_df.reply_user_count > 0])/submit_cnt if submit_cnt > 0  else 0, 2)
+    word_cnt = sum(discuss_df['wordcount'])
+    submit_weekday = round(median(submit_df['msg_weekday'].astype('int32')))
+    submit_hour = round(median(submit_df['msg_hour'].astype('int32')))
+
+    ## add column
+    filter_msg_df['submit_cnt'] = submit_cnt
+    filter_msg_df['percentage_review'] = percentage_review  ##"{:.0%}".format(percentage_review)
+    filter_msg_df['word_cnt'] = word_cnt
+    filter_msg_df['submit_weekday'] = submit_weekday ## calendar.day_name[submit_weekday]
+    filter_msg_df['submit_hour'] = submit_hour
     
+    p_msg_df = process_msg_data(msg_df, user_df, channel_df)
+    summary_df = pd.DataFrame() # convert to DataFrame
+
+    for user_id in p_msg_df[p_msg_df['DataCracy_role'].str.contains('Learner') & p_msg_df['channel_name'].str.contains('assignment')]['user_id'].unique():
+        filter_msg_df = get_summary(p_msg_df, user_id)
+        summary_df = summary_df.append(filter_msg_df, ignore_index=True)
+
     st.markdown('Hello **{}**!'.format(list(filter_user_df['real_name'])[0]))
     st.write(filter_user_df)
     st.markdown('## Lịch sử Nộp Assignment')
