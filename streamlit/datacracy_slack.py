@@ -1,9 +1,10 @@
 
-import streamlit as st                                                                                                                      
+import seaborn as sns
+import streamlit as st
 import json
 import requests
 import sys
-import os                                                                   
+import os
 import pandas as pd
 import numpy as np
 import re
@@ -11,7 +12,7 @@ from datetime import datetime as dt
 
 st.set_page_config(layout="wide")
 
-st.title('DataCracy ATOM Tiến Độ Lớp Học')                                                                          
+st.title('DataCracy ATOM Tiến Độ Lớp Học')
 # with open('./env_variable.json','r') as j:
 #     json_data = json.load(j)
 
@@ -130,8 +131,10 @@ user_id = st.sidebar.text_input("Nhập Mã Số Người Dùng", 'U01xxxx')
 valid_user_id = user_df['user_id'].str.contains(user_id).any()
 if valid_user_id:
     filter_user_df = user_df[user_df.user_id == user_id] ## dis = display =]]
-    filter_msg_df = msg_df[(msg_df.user_id == user_id) | (msg_df.reply_user1 == user_id) | (msg_df.reply_user2 == user_id)]
-    p_msg_df = process_msg_data(filter_msg_df, user_df, channel_df)
+    #filter_msg_df = msg_df[(msg_df.user_id == user_id) | (msg_df.reply_user1 == user_id) | (msg_df.reply_user2 == user_id)]
+    #p_msg_df = process_msg_data(filter_msg_df, user_df, channel_df)
+    p_msg_df = process_msg_data(msg_df, user_df, channel_df)
+    p_msg_df = p_msg_df[(p_msg_df.user_id == user_id) | (p_msg_df.reply_user1 == user_id) | (p_msg_df.reply_user2 == user_id)]
 
     ## Submission
     submit_df = p_msg_df[p_msg_df.channel_name.str.contains('assignment')]
@@ -202,8 +205,9 @@ categorical = ['user_id', 'submit_name', 'DataCracy_role']
 st.markdown('## Distribution of numerical variables:')
 cols = st.multiselect('Columns', numerical, numerical)
 
-setting_sns()
-row = len(histo_cols)
+sns.set(style='white')
+
+row = len(cols)
 fig, ax = plt.subplots(2, 3, figsize=(20, 12))
 for i, subplot in zip(numerical, ax.flatten()):
   
